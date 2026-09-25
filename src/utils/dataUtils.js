@@ -114,8 +114,31 @@ export function getStats(data) {
 /** Jumlah kegiatan per narasumber, diurutkan terbanyak -> tersedikit */
 export function getKegiatanPerNarasumber(data) {
   const map = new Map()
-  data.forEach((d) => map.set(d.nama, (map.get(d.nama) || 0) + 1))
-  return Array.from(map, ([nama, jumlah]) => ({ nama, jumlah })).sort((a, b) => b.jumlah - a.jumlah)
+
+  data.forEach((d) => {
+    if (!map.has(d.nama)) {
+      map.set(d.nama, {
+        jumlah: 0,
+        instansi: new Set(),
+      })
+    }
+
+    const item = map.get(d.nama)
+
+    // Total kegiatan
+    item.jumlah += 1
+
+    // Total instansi unik
+    if (d.instansi) {
+      item.instansi.add(d.instansi)
+    }
+  })
+
+  return Array.from(map, ([nama, value]) => ({
+    nama,
+    jumlah: value.jumlah,
+    jumlahInstansi: value.instansi.size,
+  })).sort((a, b) => b.jumlah - a.jumlah)
 }
 
 /** Distribusi mode pelaksanaan (untuk donut chart) */

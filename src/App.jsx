@@ -1,25 +1,27 @@
-import { useEffect, useState } from 'react'
-import { useNarasumberData } from './hooks/useNarasumberData'
-import Header from './components/Header'
-import StatCards from './components/StatCards'
-import FilterBar from './components/FilterBar'
-import NarasumberChart from './components/NarasumberChart'
-import ModeDonutChart from './components/ModeDonutChart'
-import TrendChart from './components/TrendChart'
-import InstansiChart from './components/InstansiChart'
-import TopikKeywords from './components/TopikKeywords'
-import Timeline from './components/Timeline'
-import DataTable from './components/DataTable'
-import DetailModal from './components/DetailModal'
+import { useEffect, useState } from "react";
+import { useNarasumberData } from "./hooks/useNarasumberData";
+import Header from "./components/Header";
+import StatCards from "./components/StatCards";
+import FilterBar from "./components/FilterBar";
+import NarasumberChart from "./components/NarasumberChart";
+import ModeDonutChart from "./components/ModeDonutChart";
+import TrendChart from "./components/TrendChart";
+import InstansiChart from "./components/InstansiChart";
+import TopikKeywords from "./components/TopikKeywords";
+import Timeline from "./components/Timeline";
+import DataTable from "./components/DataTable";
+import DetailModal from "./components/DetailModal";
 
 export default function App() {
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light')
-  const [selected, setSelected] = useState(null)
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("theme") || "light",
+  );
+  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('theme', theme)
-  }, [theme])
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   const {
     loading,
@@ -35,7 +37,7 @@ export default function App() {
     trendBulanan,
     topInstansi,
     topikKeywords,
-  } = useNarasumberData()
+  } = useNarasumberData();
 
   if (loading) {
     return (
@@ -43,7 +45,7 @@ export default function App() {
         <div className="spinner" />
         <p>Memuat data narasumber...</p>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -51,15 +53,22 @@ export default function App() {
       <div className="state-screen">
         <p>Gagal memuat data: {error}</p>
         <p className="state-hint">
-          Pastikan file <code>data.json</code> ada di folder <code>public/</code>.
+          Pastikan file <code>data.json</code> ada di folder{" "}
+          <code>public/</code>.
         </p>
       </div>
-    )
+    );
   }
 
   return (
     <div className="app">
-      <Header theme={theme} onToggleTheme={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))} stats={stats} />
+      <Header
+        theme={theme}
+        onToggleTheme={() =>
+          setTheme((t) => (t === "light" ? "dark" : "light"))
+        }
+        stats={stats}
+      />
 
       <main className="container">
         <StatCards stats={stats} />
@@ -73,24 +82,37 @@ export default function App() {
         />
 
         <section className="charts-grid">
-          <NarasumberChart data={perNarasumber} onBarClick={(nama) => updateFilter({ nama })} activeNama={filters.nama} />
-          <ModeDonutChart data={modeDistribution} onSliceClick={(mode) => updateFilter({ mode })} activeMode={filters.mode} />
+          <NarasumberChart
+            data={perNarasumber}
+            onBarClick={(nama) => updateFilter({ nama })}
+            activeNama={filters.nama}
+          />
+          <ModeDonutChart
+            data={modeDistribution}
+            onSliceClick={(mode) => updateFilter({ mode })}
+            activeMode={filters.mode}
+          />
           <TrendChart data={trendBulanan} />
           <InstansiChart data={topInstansi} />
         </section>
 
-        <TopikKeywords data={topikKeywords} />
+        {/* <TopikKeywords data={topikKeywords} /> */}
 
         <Timeline data={filteredData} onSelect={setSelected} />
 
-        <DataTable data={filteredData} onSelect={setSelected} />
+        {/* <DataTable data={filteredData} onSelect={setSelected} /> */}
       </main>
 
       <footer className="footer">
-        <p>Dashboard Narasumber Direktorat TSI &middot; {stats.total} kegiatan tercatat dalam data ini</p>
+        <p>
+          Dashboard Narasumber Direktorat TSI &middot; {stats.total} kegiatan
+          tercatat dalam data ini
+        </p>
       </footer>
 
-      {selected && <DetailModal item={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <DetailModal item={selected} onClose={() => setSelected(null)} />
+      )}
     </div>
-  )
+  );
 }
