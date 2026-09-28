@@ -7,7 +7,7 @@ import NarasumberChart from "./components/NarasumberChart";
 import ModeDonutChart from "./components/ModeDonutChart";
 import TrendChart from "./components/TrendChart";
 import InstansiChart from "./components/InstansiChart";
-import TopikKeywords from "./components/TopikKeywords";
+import TopikTerbanyak from "./components/TopikTerbanyak";
 import Timeline from "./components/Timeline";
 import DataTable from "./components/DataTable";
 import DetailModal from "./components/DetailModal";
@@ -36,7 +36,7 @@ export default function App() {
     modeDistribution,
     trendBulanan,
     topInstansi,
-    topikKeywords,
+    kategoriTopik,
   } = useNarasumberData();
 
   if (loading) {
@@ -92,11 +92,11 @@ export default function App() {
             onSliceClick={(mode) => updateFilter({ mode })}
             activeMode={filters.mode}
           />
-          <TrendChart data={trendBulanan} />
           <InstansiChart data={topInstansi} />
+          <TrendChart data={trendBulanan} />
         </section>
 
-        {/* <TopikKeywords data={topikKeywords} /> */}
+        <TopikTerbanyak data={kategoriTopik} onSelect={setSelected} />
 
         <Timeline data={filteredData} onSelect={setSelected} />
 

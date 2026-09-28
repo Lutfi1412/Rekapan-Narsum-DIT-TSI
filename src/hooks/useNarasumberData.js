@@ -6,9 +6,9 @@ import {
   getModeDistribution,
   getTrendBulanan,
   getTopInstansi,
-  getTopikKeywords,
   getNamaList,
 } from '../utils/dataUtils'
+import { getKategoriTopik } from '../utils/kategoriTopik'
 
 const INITIAL_FILTERS = { search: '', mode: 'all', nama: 'all' }
 
@@ -53,7 +53,7 @@ export function useNarasumberData() {
   const modeDistribution = useMemo(() => getModeDistribution(filteredData), [filteredData])
   const trendBulanan = useMemo(() => getTrendBulanan(filteredData), [filteredData])
   const topInstansi = useMemo(() => getTopInstansi(filteredData), [filteredData])
-  const topikKeywords = useMemo(() => getTopikKeywords(filteredData), [filteredData])
+  const kategoriTopik = useMemo(() => getKategoriTopik(filteredData), [filteredData])
 
   function updateFilter(patch) {
     setFilters((prev) => ({ ...prev, ...patch }))
@@ -77,6 +77,6 @@ export function useNarasumberData() {
     modeDistribution,
     trendBulanan,
     topInstansi,
-    topikKeywords,
+    kategoriTopik,
   }
 }

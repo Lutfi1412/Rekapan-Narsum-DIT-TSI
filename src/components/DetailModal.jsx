@@ -1,9 +1,22 @@
-import { Building2, CalendarDays, MapPin, User, Wifi, WifiOff, X } from 'lucide-react'
-import { formatRentangTanggal } from '../utils/dataUtils'
+import {
+  Building2,
+  CalendarDays,
+  MapPin,
+  User,
+  Wifi,
+  WifiOff,
+  X,
+} from "lucide-react";
+import { formatRentangTanggal } from "../utils/dataUtils";
+import { getKategoriMeta } from "../utils/kategoriTopik";
 
 export default function DetailModal({ item, onClose }) {
   const mapsUrl =
-    item.mode === 'Offline' ? `https://www.google.com/maps/search/${encodeURIComponent(item.lokasi)}` : null
+    item.mode === "Offline"
+      ? `https://www.google.com/maps/search/${encodeURIComponent(item.lokasi)}`
+      : null;
+
+  const kat = getKategoriMeta(item.kategori);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -12,9 +25,22 @@ export default function DetailModal({ item, onClose }) {
           <X size={18} />
         </button>
 
-        <span className={`badge ${item.mode === 'Online' ? 'badge-online' : 'badge-offline'}`}>
-          {item.mode === 'Online' ? <Wifi size={12} /> : <WifiOff size={12} />} {item.mode}
-        </span>
+        <div className="modal-badges">
+          <span
+            className={`badge ${item.mode === "Online" ? "badge-online" : "badge-offline"}`}
+          >
+            {item.mode === "Online" ? (
+              <Wifi size={12} />
+            ) : (
+              <WifiOff size={12} />
+            )}{" "}
+            {item.mode}
+          </span>
+          <span className="kat-chip">
+            <span className="kat-dot" style={{ background: kat.color }} />
+            {kat.label}
+          </span>
+        </div>
 
         <h3>{item.topik}</h3>
 
@@ -31,7 +57,7 @@ export default function DetailModal({ item, onClose }) {
             <CalendarDays size={15} />
             <span>
               {formatRentangTanggal(item.tglMulai, item.tglSelesai)}
-              {item.durasiHari ? ` (${item.durasiHari} hari)` : ''}
+              {item.durasiHari ? ` (${item.durasiHari} hari)` : ""}
             </span>
           </li>
           <li>
@@ -40,8 +66,13 @@ export default function DetailModal({ item, onClose }) {
               {item.lokasi}
               {mapsUrl && (
                 <>
-                  {' — '}
-                  <a href={mapsUrl} target="_blank" rel="noreferrer" className="modal-map-link">
+                  {" — "}
+                  <a
+                    href={mapsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="modal-map-link"
+                  >
                     Lihat di peta
                   </a>
                 </>
@@ -51,5 +82,5 @@ export default function DetailModal({ item, onClose }) {
         </ul>
       </div>
     </div>
-  )
+  );
 }
