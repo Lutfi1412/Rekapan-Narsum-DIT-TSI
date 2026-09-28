@@ -11,7 +11,7 @@ import {
 
 export default function TrendChart({ data }) {
   return (
-    <div className="chart-card">
+    <div className="chart-card chart-card-wide">
       <h3>Tren Kegiatan per Bulan</h3>
       <p className="chart-hint">
         Distribusi Online vs Offline tiap bulan (Jan - Sep 2026)

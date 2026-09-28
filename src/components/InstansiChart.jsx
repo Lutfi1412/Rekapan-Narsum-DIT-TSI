@@ -29,7 +29,7 @@ function InstansiTick({ x, y, payload }) {
 
 export default function InstansiChart({ data }) {
   return (
-    <div className="chart-card">
+    <div className="chart-card chart-card-wide">
       <h3>Top 10 Instansi Peminta Narasumber</h3>
       <p className="chart-hint">
         Arahkan kursor ke label untuk melihat nama lengkap jabatan/instansi
