@@ -1,3 +1,4 @@
+import { useMemo, useRef, useState } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -8,22 +9,109 @@ import {
   Tooltip,
 } from "recharts";
 
+/**
+ * Pilihan urutan.
+ * field     : kolom utama yang diurutkan
+ * secondary : kolom pembanding jika nilai field utama sama
+ * dir       : "desc" = terbanyak, "asc" = tersedikit
+ */
+const SORT_OPTIONS = [
+  {
+    value: "kegiatan-desc",
+    label: "Kegiatan terbanyak",
+    field: "jumlah",
+    secondary: "jumlahInstansi",
+    dir: "desc",
+  },
+  {
+    value: "kegiatan-asc",
+    label: "Kegiatan tersedikit",
+    field: "jumlah",
+    secondary: "jumlahInstansi",
+    dir: "asc",
+  },
+  {
+    value: "instansi-desc",
+    label: "Instansi terbanyak",
+    field: "jumlahInstansi",
+    secondary: "jumlah",
+    dir: "desc",
+  },
+  {
+    value: "instansi-asc",
+    label: "Instansi tersedikit",
+    field: "jumlahInstansi",
+    secondary: "jumlah",
+    dir: "asc",
+  },
+];
+
+function sortNarasumber(data, sortValue) {
+  const option =
+    SORT_OPTIONS.find((o) => o.value === sortValue) ?? SORT_OPTIONS[0];
+  const direction = option.dir === "asc" ? 1 : -1;
+
+  return [...data].sort((a, b) => {
+    // 1. Urutkan berdasarkan kolom utama
+    if (a[option.field] !== b[option.field]) {
+      return (a[option.field] - b[option.field]) * direction;
+    }
+
+    // 2. Jika sama, pakai kolom pembanding dengan arah yang sama
+    if (a[option.secondary] !== b[option.secondary]) {
+      return (a[option.secondary] - b[option.secondary]) * direction;
+    }
+
+    // 3. Jika masih sama, nama A-Z
+    return a.nama.localeCompare(b.nama);
+  });
+}
+
 export default function NarasumberChart({ data, onBarClick, activeNama }) {
-  const chartHeight = Math.max(280, data.length * 45);
+  const [sortBy, setSortBy] = useState("kegiatan-desc");
+  const scrollRef = useRef(null);
+
+  const sortedData = useMemo(
+    () => sortNarasumber(data, sortBy),
+    [data, sortBy],
+  );
+  const chartHeight = Math.max(280, sortedData.length * 45);
+
+  function handleSortChange(e) {
+    setSortBy(e.target.value);
+
+    // Kembalikan scroll ke atas agar urutan teratas langsung terlihat
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }
 
   return (
     <div className="chart-card">
-      <h3>Jumlah Kegiatan per Narasumber</h3>
+      <div className="chart-card-header">
+        <div>
+          <h3>Jumlah Kegiatan per Narasumber</h3>
 
-      <p className="chart-hint">
-        Klik salah satu batang untuk memfilter seluruh dashboard
-      </p>
+          <p className="chart-hint">
+            Klik salah satu batang untuk memfilter seluruh dashboard
+          </p>
+        </div>
 
-      <div className="narasumber-chart-scroll">
+        <label className="chart-sort">
+          <span>Urutkan</span>
+          <select value={sortBy} onChange={handleSortChange}>
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <div className="narasumber-chart-scroll" ref={scrollRef}>
         <div className="narasumber-chart-inner" style={{ height: chartHeight }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={data}
+              data={sortedData}
               layout="vertical"
               margin={{
                 top: 4,
@@ -74,7 +162,7 @@ export default function NarasumberChart({ data, onBarClick, activeNama }) {
                   onBarClick(entry.nama === activeNama ? "all" : entry.nama)
                 }
               >
-                {data.map((entry) => (
+                {sortedData.map((entry) => (
                   <Cell
                     key={entry.nama}
                     fill={
@@ -92,7 +180,7 @@ export default function NarasumberChart({ data, onBarClick, activeNama }) {
                 name="Total Instansi"
                 radius={[0, 8, 8, 0]}
               >
-                {data.map((entry) => (
+                {sortedData.map((entry) => (
                   <Cell key={`instansi-${entry.nama}`} fill="orange" />
                 ))}
               </Bar>
