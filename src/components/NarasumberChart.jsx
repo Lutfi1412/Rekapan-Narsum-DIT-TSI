@@ -77,6 +77,47 @@ export default function NarasumberChart({ data, onBarClick, activeNama }) {
   );
   const chartHeight = Math.max(280, sortedData.length * 45);
 
+  const isInstansiSort = sortBy.startsWith("instansi");
+
+  // TOTAL KEGIATAN (biru)
+  const barKegiatan = (
+    <Bar
+      key="kegiatan"
+      dataKey="jumlah"
+      name="Total Kegiatan"
+      radius={[0, 8, 8, 0]}
+      cursor="pointer"
+      onClick={(entry) =>
+        onBarClick(entry.nama === activeNama ? "all" : entry.nama)
+      }
+    >
+      {sortedData.map((entry) => (
+        <Cell
+          key={entry.nama}
+          fill={
+            activeNama === "all" || activeNama === entry.nama
+              ? "var(--color-primary)"
+              : "var(--color-primary-soft)"
+          }
+        />
+      ))}
+    </Bar>
+  );
+
+  // TOTAL INSTANSI (oranye)
+  const barInstansi = (
+    <Bar
+      key="instansi"
+      dataKey="jumlahInstansi"
+      name="Total Instansi"
+      radius={[0, 8, 8, 0]}
+    >
+      {sortedData.map((entry) => (
+        <Cell key={`instansi-${entry.nama}`} fill="orange" />
+      ))}
+    </Bar>
+  );
+
   function handleSortChange(e) {
     setSortBy(e.target.value);
 
@@ -152,38 +193,12 @@ export default function NarasumberChart({ data, onBarClick, activeNama }) {
                 }}
               />
 
-              {/* TOTAL KEGIATAN */}
-              <Bar
-                dataKey="jumlah"
-                name="Total Kegiatan"
-                radius={[0, 8, 8, 0]}
-                cursor="pointer"
-                onClick={(entry) =>
-                  onBarClick(entry.nama === activeNama ? "all" : entry.nama)
-                }
-              >
-                {sortedData.map((entry) => (
-                  <Cell
-                    key={entry.nama}
-                    fill={
-                      activeNama === "all" || activeNama === entry.nama
-                        ? "var(--color-primary)"
-                        : "var(--color-primary-soft)"
-                    }
-                  />
-                ))}
-              </Bar>
-
-              {/* TOTAL INSTANSI */}
-              <Bar
-                dataKey="jumlahInstansi"
-                name="Total Instansi"
-                radius={[0, 8, 8, 0]}
-              >
-                {sortedData.map((entry) => (
-                  <Cell key={`instansi-${entry.nama}`} fill="orange" />
-                ))}
-              </Bar>
+              {/* Urutan bar mengikuti jenis sort:
+                  sort kegiatan → biru di atas, oranye di bawah
+                  sort instansi → oranye di atas, biru di bawah */}
+              {isInstansiSort
+                ? [barInstansi, barKegiatan]
+                : [barKegiatan, barInstansi]}
             </BarChart>
           </ResponsiveContainer>
         </div>
