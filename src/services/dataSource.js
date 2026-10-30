@@ -12,6 +12,9 @@
 /** URL API publik rekapan narsum (hardcode, bukan dari env). */
 export const API_BASE_URL = "https://api-rekapan-narsum.vercel.app";
 
+/** Sumber data default saat halaman pertama kali dibuka. */
+export const DEFAULT_SOURCE = "api";
+
 export const DATA_SOURCES = {
   local: {
     id: "local",
@@ -27,13 +30,13 @@ export const DATA_SOURCES = {
 
 const STORAGE_KEY = "narsum.dataSource";
 
-/** Sumber data tersimpan (default: lokal). */
+/** Sumber data tersimpan (default: API publik). */
 export function getSavedSource() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved && DATA_SOURCES[saved] ? saved : "local";
+    return saved && DATA_SOURCES[saved] ? saved : DEFAULT_SOURCE;
   } catch {
-    return "local";
+    return DEFAULT_SOURCE;
   }
 }
 

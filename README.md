@@ -68,9 +68,10 @@ Ada switch **Lokal | API** di kanan atas header.
 
 - **Lokal** membaca `public/data.json` lewat `fetch('/data.json')`.
   File ini **tidak diubah** — tetap dipakai apa adanya.
-- **API** membaca `GET https://api-rekapan-narsum.vercel.app/` (endpoint publik, tanpa token).
-  URL-nya **di-hardcode** di `src/services/dataSource.js` (konstanta `API_BASE_URL`),
-  sengaja tidak lewat `.env` supaya tinggal pakai dan gampang diganti kalau API pindah host.
+- **API** adalah sumber **default** saat halaman pertama kali dibuka: `GET https://api-rekapan-narsum.vercel.app/`
+  (endpoint publik, tanpa token). URL-nya **di-hardcode** di `src/services/dataSource.js`
+  (konstanta `API_BASE_URL` / `DEFAULT_SOURCE`), sengaja tidak lewat `.env` supaya tinggal pakai dan
+  gampang diganti kalau API pindah host.
 - Pilihan sumber disimpan di `localStorage` (key `narsum.dataSource`), jadi saat halaman
   dibuka lagi sumber terakhir yang dipakai otomatis aktif kembali.
 - Bentuk respons API dinormalisasi agar identik dengan `public/data.json`: setiap item diberi
