@@ -1,6 +1,16 @@
-import { RotateCcw, Search } from 'lucide-react'
+import { FileSpreadsheet, Loader2, RotateCcw, Search } from 'lucide-react'
 
-export default function FilterBar({ filters, updateFilter, resetFilters, namaList, totalTampil }) {
+export default function FilterBar({
+  filters,
+  updateFilter,
+  resetFilters,
+  namaList,
+  totalTampil,
+  onExport,
+  exporting,
+  exportMessage,
+  sourceInfo,
+}) {
   return (
     <section className="filter-bar">
       <div className="filter-search">
@@ -31,6 +41,21 @@ export default function FilterBar({ filters, updateFilter, resetFilters, namaLis
       <button className="btn-reset" onClick={resetFilters}>
         <RotateCcw size={14} /> Reset
       </button>
+
+      <button
+        type="button"
+        className="btn-export"
+        onClick={onExport}
+        disabled={exporting || totalTampil === 0}
+        title={`Export ${totalTampil} kegiatan ke file Excel (.xlsx)`}
+      >
+        {exporting ? <Loader2 size={14} className="spin" /> : <FileSpreadsheet size={14} />}
+        {exportMessage || (exporting ? 'Menyiapkan…' : 'Export XLSX')}
+      </button>
+
+      <span className="filter-source" title={sourceInfo?.hint}>
+        {sourceInfo?.label}
+      </span>
 
       <span className="filter-count">{totalTampil} kegiatan ditemukan</span>
     </section>

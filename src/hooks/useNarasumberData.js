@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   normalizeData,
   getStats,
@@ -9,30 +9,63 @@ import {
   getNamaList,
 } from '../utils/dataUtils'
 import { getKategoriTopik } from '../utils/kategoriTopik'
+import {
+  DATA_SOURCES,
+  getSavedSource,
+  loadDataSource,
+  saveSource,
+} from '../services/dataSource'
 
 const INITIAL_FILTERS = { search: '', mode: 'all', nama: 'all' }
 
 /**
- * Hook utama dashboard: mengambil data.json dari folder public,
- * menormalisasinya, lalu menyediakan data terfilter + semua agregat
- * yang dipakai kartu statistik, chart, linimasa, dan tabel.
+ * Hook utama dashboard: mengambil data dari sumber yang dipilih
+ * (public/data.json atau API publik), menormalisasinya, lalu menyediakan
+ * data terfilter + semua agregat yang dipakai kartu statistik, chart,
+ * linimasa, dan tabel.
  */
 export function useNarasumberData() {
+  const [source, setSource] = useState(getSavedSource)
+  const [reloadKey, setReloadKey] = useState(0)
   const [rawData, setRawData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [loadedAt, setLoadedAt] = useState(null)
   const [filters, setFilters] = useState(INITIAL_FILTERS)
 
   useEffect(() => {
-    fetch('/data.json')
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.json()
+    let active = true
+
+    setLoading(true)
+    setError(null)
+
+    loadDataSource(source)
+      .then((json) => {
+        if (!active) return
+        setRawData(normalizeData(json))
+        setLoadedAt(new Date())
       })
-      .then((json) => setRawData(normalizeData(json)))
-      .catch((err) => setError(err.message || 'Terjadi kesalahan saat memuat data'))
-      .finally(() => setLoading(false))
+      .catch((err) => {
+        if (!active) return
+        setRawData([])
+        setError(err?.message || 'Terjadi kesalahan saat memuat data')
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [source, reloadKey])
+
+  const changeSource = useCallback((next) => {
+    if (!DATA_SOURCES[next]) return
+    saveSource(next)
+    setSource(next)
   }, [])
+
+  const reload = useCallback(() => setReloadKey((key) => key + 1), [])
 
   const filteredData = useMemo(() => {
     const q = filters.search.trim().toLowerCase()
@@ -66,6 +99,11 @@ export function useNarasumberData() {
   return {
     loading,
     error,
+    source,
+    sourceInfo: DATA_SOURCES[source] ?? DATA_SOURCES.local,
+    changeSource,
+    reload,
+    loadedAt,
     rawData,
     filteredData,
     filters,
